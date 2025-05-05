@@ -52,25 +52,8 @@ class Motif:
 class Sequence:
     def __init__(self, header, sequence):
         self.sequence = sequence
-        self.location = self.get_location(header)
         self.exons = self.find_exons()
         self.length = len(self.sequence) 
-
-    def get_location(self,header):
-        """
-        Gets gene coordinates from header line of fasta file
-
-        Inputs:
-        -------
-        header: str
-
-        Outputs:
-        -------
-        loc: str
-            genomic coordinates (start and end):
-        """
-        loc = header.split('')[1]
-        return loc
     
     def find_exons(self) -> list[tuple[int,int]]:
         """
@@ -91,9 +74,13 @@ class Sequence:
             matches.append((m.start(), m.end()))
         return matches
 
+class Plot():
+        
+
+
 def main():
     args = get_args()
-    reader = FastaReader(args.f)
+    reader = FastaReader.from_filename(args.f)
     for rec in reader:
         print(rec.header, rec.sequence)
 

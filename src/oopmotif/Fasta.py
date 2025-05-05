@@ -109,16 +109,16 @@ class FastaWriter:
 
 reader = FastaReader.from_filename("/Users/norakearns/Demo_Code/OOPMotif/tests/test_sequences.fasta")
 for rec in reader:
-    print(rec.header, len(rec.sequence))
+    print(rec.header, rec.sequence)
 # …then if you need to iterate again:
 reader.reset()
 
-records = [
-    FastaRecord("seq1", "ACGT"*30),
-    FastaRecord("seq2", "GGGGCCCCTTTT")
-]
+# records = [
+#     FastaRecord("seq1", "ACGT"*30),
+#     FastaRecord("seq2", "GGGGCCCCTTTT")
+# ]
 
-writer = FastaWriter.from_filename("out.fa.gz")
-for rec in records:
-    writer.write(rec)
-writer.close()
+# writer = FastaWriter.from_filename("out.fa.gz")
+# for rec in records:
+#     writer.write(rec)
+# writer.close()
