@@ -5,6 +5,8 @@ import cairo
 import argparse
 import logging
 
+from Fasta import FastaReader
+
 logging.basicConfig(level=logging.INFO)
 
 IUPAC_dict = {
@@ -17,23 +19,6 @@ def get_args():
     parser.add_argument("-f", required=True, help="FASTA file with sequences")
     parser.add_argument("-m", required=True, help="Motifs file")
     return parser.parse_args()
-
-def parse_fasta(filepath):
-    sequences = []
-    names = []
-    with open(filepath, 'r') as f:
-        seq = ''
-        for line in f:
-            if line.startswith(">"):
-                if seq:
-                    sequences.append(seq)
-                    seq = ''
-                names.append(line[1:].strip())
-            else:
-                seq += line.strip()
-        if seq:
-            sequences.append(seq)
-    return names, sequences
 
 class Motif:
     def __init__(self, motif):
@@ -68,13 +53,15 @@ class Sequence:
     def __init__(self, header, sequence):
         self.sequence = sequence
         self.location = self.get_location(header)
+        self.exons = self.find_exons()
+        self.length = len(self.sequence) 
 
     def get_location(self,header):
         """
         Gets gene coordinates from header line of fasta file
 
         Inputs:
-        ------
+        -------
         header: str
 
         Outputs:
@@ -85,13 +72,31 @@ class Sequence:
         loc = header.split('')[1]
         return loc
     
-    def find_exons(self):
-        """Identify the start and end coordinates of exonic (uppercase) regions."""
-        match = re.search(r'[A-Z]+', self.sequence)
-        if not match:
-            return (0,0)
-        return (match.start(), match.end())
-    
+    def find_exons(self) -> list[tuple[int,int]]:
+        """
+        Identify the start and end coordinates of exonic (uppercase) regions.
+        
+        Inputs:
+        -------
+        motif: str
 
+        Outputs:
+        --------
+        matches: list[tuples]
+            list of tuples representing start and end of exonic regions
+        
+        """
+        matches = []
+        for m in re.finditer(r"[A-Z]+", self.sequence):
+            matches.append((m.start(), m.end()))
+        return matches
 
+def main():
+    args = get_args()
+    reader = FastaReader(args.f)
+    for rec in reader:
+        print(rec.header, rec.sequence)
+
+if __name__ == "__main__":
+    main()
 
